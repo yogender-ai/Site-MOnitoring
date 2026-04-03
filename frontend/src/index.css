@@ -1,9 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Outfit", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
 
 @layer base {
   body {
-    @apply bg-zinc-950 text-white min-h-screen antialiased font-sans;
+    @apply bg-black text-white min-h-screen antialiased selection:bg-emerald-500/30 font-sans;
   }
 }
