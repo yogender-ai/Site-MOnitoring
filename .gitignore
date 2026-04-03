@@ -1,0 +1,13 @@
+node_modules/
+.env
+.DS_Store
+dist/
+dist-ssr/
+*.local
+frontend/node_modules/
+backend/node_modules/
+frontend/dist/
+backend/.env
+frontend/.env
+.github/
+.vscode/
