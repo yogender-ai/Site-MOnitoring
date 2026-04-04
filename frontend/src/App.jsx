@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Activity, Plus, Server, CheckCircle2, XCircle, Trash2, Clock, Globe, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, ResponsiveContainer, YAxis, Tooltip, XAxis, CartesianGrid } from 'recharts';
 import { format } from 'date-fns';
 import { getMonitors, addMonitor, deleteMonitor, getLogs } from './api';
+import { Toaster, toast } from 'sonner';
 
 function formatDistanceStrict(date) {
   const diff = Date.now() - new Date(date).getTime();
@@ -101,7 +102,7 @@ function DetailedModal({ monitor, initialLogs, onClose }) {
     // Poll for real-time log updates while modal is open
     const intv = setInterval(() => {
       getLogs(monitor.id).then(data => setLogs(data.reverse()));
-    }, monitor.interval_seconds * 1000);
+    }, Math.min(monitor.interval_seconds * 1000, 5000));
     return () => clearInterval(intv);
   }, [monitor]);
 
@@ -239,9 +240,22 @@ function App() {
   const [selectedMonitor, setSelectedMonitor] = useState(null);
   const [formData, setFormData] = useState({ name: '', url: 'https://', interval_seconds: 60 });
   const [loading, setLoading] = useState(true);
+  const prevStatuses = useRef({});
 
   const loadData = () => {
     getMonitors().then(data => {
+      data.forEach(monitor => {
+        const prev = prevStatuses.current[monitor.id];
+        if (prev && prev !== monitor.status) {
+          if (monitor.status === 'DOWN') {
+             toast.error(`${monitor.name} just went DOWN!`, { duration: 10000 });
+          } else if (monitor.status === 'UP') {
+             toast.success(`${monitor.name} is back UP!`, { duration: 5000 });
+          }
+        }
+        prevStatuses.current[monitor.id] = monitor.status;
+      });
+
       setMonitors(data);
       setLoading(false);
     }).catch(e => console.error(e));
@@ -249,7 +263,7 @@ function App() {
 
   useEffect(() => {
     loadData();
-    const intv = setInterval(loadData, 15000);
+    const intv = setInterval(loadData, 5000);
     return () => clearInterval(intv);
   }, []);
 
@@ -273,9 +287,13 @@ function App() {
 
   const activeCount = monitors.filter(m => m.status === 'UP').length;
   const downCount = monitors.length - activeCount;
+  const globalUptime = monitors.length > 0 ? ((activeCount / monitors.length) * 100).toFixed(1) : 100;
 
   return (
-    <div className="min-h-screen bg-[#000000] text-white font-sans selection:bg-emerald-500/30 pb-20">
+    <div className="min-h-screen bg-[#000000] text-white font-sans selection:bg-emerald-500/30 pb-20 relative overflow-hidden">
+      <Toaster theme="dark" richColors position="bottom-right" />
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-900/20 blur-[150px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-900/10 blur-[150px] rounded-full pointer-events-none"></div>
       
       {/* Premium Header */}
       <header className="sticky top-0 z-40 bg-black/60 backdrop-blur-2xl border-b border-zinc-900 support-backdrop-blur:bg-white/95">
@@ -301,26 +319,33 @@ function App() {
 
       <main className="max-w-7xl mx-auto px-6 mt-16">
         {/* Dynamic Overview Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-12">
           <div className="md:col-span-2 flex flex-col justify-center">
-            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-br from-white via-white to-zinc-600 bg-clip-text text-transparent mb-3">
+            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-br from-white via-white to-zinc-600 bg-clip-text text-transparent mb-3 animate-pulse">
               Network Pulse
             </h2>
             <p className="text-zinc-400 text-lg">Real-time health telemetry across all infrastructure endpoints.</p>
           </div>
           
-          <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-3xl p-6 flex flex-col justify-center items-center relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-4 opacity-10"><Server className="w-20 h-20 text-white"/></div>
+          <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-3xl p-6 flex flex-col justify-center items-center relative overflow-hidden group hover:border-zinc-700 transition-colors">
+             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform"><Server className="w-20 h-20 text-white"/></div>
              <span className="text-sm font-semibold text-zinc-400 uppercase tracking-widest mb-1 z-10">Total endpoints</span>
              <span className="text-5xl font-black text-white z-10">{monitors.length}</span>
           </div>
-          <div className="bg-emerald-950/20 backdrop-blur-sm border border-emerald-900/30 rounded-3xl p-6 flex flex-col justify-center items-center relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-4 opacity-5"><Activity className="w-20 h-20 text-emerald-500"/></div>
+
+          <div className="bg-teal-950/20 backdrop-blur-sm border border-teal-900/30 rounded-3xl p-6 flex flex-col justify-center items-center relative overflow-hidden group hover:border-teal-900/50 transition-colors">
+             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform"><Activity className="w-20 h-20 text-teal-500"/></div>
+             <span className="text-sm font-semibold text-teal-500 uppercase tracking-widest mb-1 z-10">Global Uptime</span>
+             <span className="text-5xl font-black text-teal-400 z-10 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">{globalUptime}%</span>
+          </div>
+
+          <div className="bg-emerald-950/20 backdrop-blur-sm border border-emerald-900/30 rounded-3xl p-6 flex flex-col justify-center items-center relative overflow-hidden group hover:border-emerald-900/50 transition-colors">
+             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform"><CheckCircle2 className="w-20 h-20 text-emerald-500"/></div>
              <span className="text-sm font-semibold text-emerald-500 uppercase tracking-widest mb-1 z-10">System Status</span>
              <div className="flex items-center gap-2 z-10 mt-1">
-               <div className={`w-3 h-3 rounded-full ${downCount > 0 ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500 animate-pulse shadow-[0_0_15px_#10b981]'}`}></div>
+               <div className={`w-3 h-3 rounded-full ${downCount > 0 ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse shadow-[0_0_15px_#10b981]'}`}></div>
                <span className={`text-xl font-bold ${downCount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                 {downCount > 0 ? `${downCount} Degraded` : 'All Systems Operational'}
+                 {downCount > 0 ? `${downCount} Degraded` : 'Fully Operational'}
                </span>
              </div>
           </div>

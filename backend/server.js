@@ -73,6 +73,20 @@ app.get('/api/monitors/:id/logs', async (req, res) => {
   }
 });
 
+// Self-ping block to prevent sleeping on free tiers
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL || process.env.SELF_URL;
+if (RENDER_URL) {
+  setInterval(() => {
+    // Determine http or https
+    const httpModule = RENDER_URL.startsWith('https') ? require('https') : require('http');
+    httpModule.get(`${RENDER_URL}/api/keep-alive`, (resp) => {
+      console.log(`Self-ping complete: ${resp.statusCode}`);
+    }).on("error", (err) => {
+      console.log("Self-ping Error: " + err.message);
+    });
+  }, 14 * 60 * 1000); // 14 mins
+}
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
