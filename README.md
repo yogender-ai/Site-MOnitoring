@@ -21,6 +21,11 @@
 
 <br><br>
 
+<img src="./assets/dashboard.png" alt="Nexus Dashboard Preview" width="100%" style="border-radius: 10px; box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);" />
+> 💡 *Note: Save your actual dashboard screenshot as `dashboard.png` in an `assets` folder!*
+
+<br><br>
+
 <img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
 
 </div>
