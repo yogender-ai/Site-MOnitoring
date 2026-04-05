@@ -3,7 +3,9 @@ const { pool } = require('./db');
 
 const pingAll = async () => {
   try {
-    const { rows: monitors } = await pool.query('SELECT * FROM monitors');
+    const { rows: monitors } = await pool.query(
+      'SELECT * FROM monitors WHERE user_id IS NOT NULL'
+    );
     
     for (let monitor of monitors) {
       // Very simple logic: We check if it's time to ping based on interval_seconds
