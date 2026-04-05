@@ -285,6 +285,18 @@ function App() {
     }
   };
 
+  const [theme, setTheme] = useState("dark");
+  useEffect(() => {
+  document.documentElement.classList.toggle("dark", theme === "dark");
+}, [theme]);
+  <button
+  onClick={() =>
+    setTheme(theme === "dark" ? "light" : "dark")
+  }
+>
+  Toggle Theme
+</button>
+
   const activeCount = monitors.filter(m => m.status === 'UP').length;
   const downCount = monitors.length - activeCount;
   const globalUptime = monitors.length > 0 ? ((activeCount / monitors.length) * 100).toFixed(1) : 100;
