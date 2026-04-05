@@ -82,3 +82,27 @@ We will review your code as quickly as possible. Welcome to the Nexus Alliance! 
 <div align="center">
   <img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
 </div>
+
+## 👨‍💻 Code Style
+
+To maintain consistency across the codebase, please follow these guidelines:
+
+- **camelCase** for variables and functions
+- **2 spaces** for indentation
+- Add **comments** for complex logic to improve readability
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
+</div>
+
+## 📝 Commit Message Format
+
+Use clear and descriptive commit messages following this format:
+
+- `feat: add email alert system`
+- `fix: resolve dashboard bug`
+- `docs: update README`
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
+</div>
