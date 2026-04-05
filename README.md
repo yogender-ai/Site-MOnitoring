@@ -1,6 +1,6 @@
 <div align="center">
 
-# <a href="https://github.com/yogender-ai/Site-Monitoring"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=800&size=50&pause=1000&color=00F0FF&center=true&vCenter=true&width=600&height=100&lines=NEXUS;Continuous+Uptime+Tracking;Real-Time+Analytics;Zero+Downtime;Next-Gen+Monitoring" alt="Typing SVG - Nexus" /></a>
+# <a href="https://github.com/yogender-ai/Site-Monitoring"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=800&size=45&pause=1000&color=00F0FF&center=true&vCenter=true&width=900&height=100&lines=NEXUS;Continuous+Uptime+Tracking;Real-Time+Analytics;Zero+Downtime;Next-Gen+Monitoring" alt="Typing SVG - Nexus" style="max-width: 100%;" /></a>
 
 **The ultimate, full-stack monitoring nexus designed to continuously track website uptime, prevent server hibernation, and display real-time analytics through a futuristic dashboard.**
 
