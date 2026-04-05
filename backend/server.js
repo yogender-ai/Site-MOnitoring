@@ -40,11 +40,27 @@ app.get('/api/monitors', requireAuth, async (req, res) => {
 });
 
 // 3. Add a monitor
-app.post('/api/monitors', requireAuth, async (req, res) => {
+const rateLimit = require('express-rate-limit');
+const createMonitorLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Too many monitors created from this IP, please try again after 15 minutes' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.post('/api/monitors', requireAuth, createMonitorLimiter, async (req, res) => {
   const { url, name, interval_seconds } = req.body;
   if (!url || !name) return res.status(400).json({ error: 'missing fields' });
 
   try {
+    const countRes = await pool.query('SELECT COUNT(*) FROM monitors WHERE user_id = $1', [req.user.id]);
+    const monitorCount = parseInt(countRes.rows[0].count, 10);
+    
+    if (monitorCount >= 15) {
+      return res.status(403).json({ error: 'Monitor limit reached. You can only create up to 15 monitors.' });
+    }
+
     const { rows } = await pool.query(
       'INSERT INTO monitors (url, name, interval_seconds, status, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [url, name, interval_seconds || 60, 'UP', req.user.id]

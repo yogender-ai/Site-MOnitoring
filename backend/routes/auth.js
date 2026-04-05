@@ -2,8 +2,25 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const rateLimit = require('express-rate-limit');
 
 const router = express.Router();
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // Limit each IP to 3 create account requests per hour
+  message: { error: 'Too many accounts created from this IP, please try again after an hour' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 login requests per 15 minutes
+  message: { error: 'Too many login attempts from this IP, please try again after 15 minutes' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const SALT_ROUNDS = 10;
 const MIN_PASSWORD_LENGTH = 8;
@@ -16,7 +33,7 @@ function signToken(user) {
   );
 }
 
-router.post('/register', async (req, res) => {
+router.post('/register', registerLimiter, async (req, res) => {
   if (!process.env.JWT_SECRET) {
     return res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is not set' });
   }
@@ -51,7 +68,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   if (!process.env.JWT_SECRET) {
     return res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is not set' });
   }
