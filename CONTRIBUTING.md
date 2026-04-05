@@ -1,25 +1,84 @@
-# Contributing to Nexus 🚀
+<div align="center">
 
-First off, thank you for considering contributing to **Nexus**! It's people like you that make Nexus such a great tool for the community.
+# <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=800&size=40&pause=1000&color=FF0055&center=true&vCenter=true&width=800&height=80&lines=Contribute+to+NEXUS;Join+the+Network;Enhance+the+Core" alt="Typing SVG - Contribute" style="max-width: 100%;" />
 
-## Where do I go from here?
+**First off, thank you for considering contributing to the ultimate uptime monitor! Establish your connection and begin building.**
 
-If you've noticed a bug or have a feature request, make sure to check our [Issues](../../issues) page to see if someone else has already created a ticket. If not, go ahead and make one!
+<img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
 
-## Fork & create a branch
+</div>
 
-If this is something you think you can fix, then [fork Nexus](https://help.github.com/articles/fork-a-repo) and create a branch with a descriptive name.
+---
 
-## Local Setup
+## 🛠️ The Mission
 
-To get your development environment set up, please refer to the **Initializing Nexus** section in our `README.md`. It covers exactly how to start the backend PostgreSQL/Express API and the frontend React application.
+Nexus is open-source and built for everyone. Whether you're fixing bugs, adding new integrations, or optimizing the API, your code keeps the network alive.
 
-## Submitting a Pull Request
+<div align="center">
+  <img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
+</div>
 
-1. Clone your fork and create a new branch: `git checkout -b my-feature-branch`
-2. Make your proposed changes.
-3. Keep your PRs as small and focused as possible.
-4. Push your changes to your fork: `git push origin my-feature-branch`
-5. Open a Pull Request from your branch against the `main` branch of `Nexus`.
+## 📡 Where do I go from here?
 
-We'll review your PR as soon as possible. Thank you for making Nexus better!
+If you've noticed a vulnerability, glitch, or have a feature blueprint:
+1. **Check the Radar:** Look at our [Issues](../../issues) page to see if a ticket is already active.
+2. **Open a Channel:** If not, create an issue to describe the problem or feature before you begin coding!
+
+## ⚙️ How to Establish a Sync (Fork & Branch)
+
+If you're ready to deploy a fix:
+1. **Fork the Core:** Click the `Fork` button at the top of the Nexus repository.
+2. **Create a Feature Branch:** Always isolate your code. Use a descriptive name:
+   ```bash
+   git checkout -b feature/dynamic-alerts
+   ```
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
+</div>
+
+## 💻 Local Developer Environment
+
+To get your local instance of Nexus running, you must ignite the Backend and Frontend nodes.
+
+<details>
+  <summary><b>1. Ignite the Backend (Node/Postgres) -> Click to view</b></summary>
+  
+  ```bash
+  cd backend
+  npm install
+  npm run dev
+  ```
+  *Make sure your `.env` contains your `DATABASE_URL`!*
+</details>
+
+<details>
+  <summary><b>2. Ignite the Frontend (React) -> Click to view</b></summary>
+  
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+  *This will launch the dashboard UI at `http://localhost:5173`.*
+</details>
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
+</div>
+
+## 🚀 Pushing the Payload (Pull Request)
+
+1. Make your proposed changes to your isolated branch.
+2. Keep your Pull Requests as compact and feature-focused as possible. (Don't combine 5 different features in one PR!)
+3. Push your branch to your remote fork:
+   ```bash
+   git push origin feature/dynamic-alerts
+   ```
+4. Transmit the Pull Request from your branch into the `main` branch of the official Nexus repository.
+
+We will review your code as quickly as possible. Welcome to the Nexus Alliance! 🤝
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/7wq/7wq/main/imgs/line_multi.gif" width="100%" />
+</div>

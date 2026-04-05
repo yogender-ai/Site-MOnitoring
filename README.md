@@ -12,6 +12,12 @@
   <a href="https://render.com/"><img src="https://img.shields.io/badge/Render-%46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render"/></a>
 </p>
 
+<p align="center">
+  <a href="https://pingbot.yogender1.me/">
+    <img src="https://img.shields.io/badge/🔴_LIVE_SYSTEM_ONLINE-Access_Dashboard_Here-FF0055?style=for-the-badge" alt="Live Demo Nexus" />
+  </a>
+</p>
+
 <br />
 
 <!-- Interactive Tech Stack Icons (Clickable) -->
@@ -22,7 +28,6 @@
 <br><br>
 
 <img src="./assets/dashboard.png" alt="Nexus Dashboard Preview" width="100%" style="border-radius: 10px; box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);" />
-> 💡 *Note: Save your actual dashboard screenshot as `dashboard.png` in an `assets` folder!*
 
 <br><br>
 
