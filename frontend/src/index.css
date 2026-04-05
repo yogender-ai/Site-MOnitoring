@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Inter", "Outfit", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-black text-white min-h-screen antialiased selection:bg-emerald-500/30 font-sans;
+    @apply bg-zinc-50 text-zinc-900 min-h-screen antialiased font-sans selection:bg-emerald-500/20 dark:bg-black dark:text-white dark:selection:bg-emerald-500/30;
   }
 }

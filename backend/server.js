@@ -3,6 +3,8 @@ const cors = require('cors');
 require('dotenv').config();
 const { pool, initDB } = require('./db');
 const { startPinger } = require('./pinger');
+const authRoutes = require('./routes/auth');
+const { requireAuth } = require('./middleware/auth');
 
 const app = express();
 app.use(cors());
@@ -17,15 +19,20 @@ initDB().then(() => {
 // API Endpoints
 // -------------
 
+app.use('/api/auth', authRoutes);
+
 // 1. Keep-Alive for Uptime Robot
 app.get('/api/keep-alive', (req, res) => {
-  res.status(200).send("Alive");
+  res.status(200).send('Alive');
 });
 
-// 2. Get all monitors
-app.get('/api/monitors', async (req, res) => {
+// 2. Get all monitors (authenticated, scoped to user)
+app.get('/api/monitors', requireAuth, async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM monitors ORDER BY created_at DESC');
+    const { rows } = await pool.query(
+      'SELECT * FROM monitors WHERE user_id = $1 ORDER BY created_at DESC',
+      [req.user.id]
+    );
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -33,14 +40,14 @@ app.get('/api/monitors', async (req, res) => {
 });
 
 // 3. Add a monitor
-app.post('/api/monitors', async (req, res) => {
+app.post('/api/monitors', requireAuth, async (req, res) => {
   const { url, name, interval_seconds } = req.body;
-  if (!url || !name) return res.status(400).json({ error: "missing fields" });
-  
+  if (!url || !name) return res.status(400).json({ error: 'missing fields' });
+
   try {
     const { rows } = await pool.query(
-      'INSERT INTO monitors (url, name, interval_seconds, status) VALUES ($1, $2, $3, $4) RETURNING *',
-      [url, name, interval_seconds || 60, 'UP']
+      'INSERT INTO monitors (url, name, interval_seconds, status, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [url, name, interval_seconds || 60, 'UP', req.user.id]
     );
     res.status(201).json(rows[0]);
   } catch (error) {
@@ -49,10 +56,13 @@ app.post('/api/monitors', async (req, res) => {
 });
 
 // 4. Delete a monitor
-app.delete('/api/monitors/:id', async (req, res) => {
+app.delete('/api/monitors/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM monitors WHERE id = $1', [id]);
+    const result = await pool.query('DELETE FROM monitors WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Monitor not found' });
+    }
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -60,9 +70,13 @@ app.delete('/api/monitors/:id', async (req, res) => {
 });
 
 // 5. Get logs for a monitor (e.g. last 50)
-app.get('/api/monitors/:id/logs', async (req, res) => {
+app.get('/api/monitors/:id/logs', requireAuth, async (req, res) => {
   const { id } = req.params;
   try {
+    const own = await pool.query('SELECT 1 FROM monitors WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    if (own.rows.length === 0) {
+      return res.status(404).json({ error: 'Monitor not found' });
+    }
     const { rows } = await pool.query(
       'SELECT * FROM logs WHERE monitor_id = $1 ORDER BY created_at DESC LIMIT 50',
       [id]
@@ -81,8 +95,8 @@ if (RENDER_URL) {
     const httpModule = RENDER_URL.startsWith('https') ? require('https') : require('http');
     httpModule.get(`${RENDER_URL}/api/keep-alive`, (resp) => {
       console.log(`Self-ping complete: ${resp.statusCode}`);
-    }).on("error", (err) => {
-      console.log("Self-ping Error: " + err.message);
+    }).on('error', (err) => {
+      console.log('Self-ping Error: ' + err.message);
     });
   }, 14 * 60 * 1000); // 14 mins
 }
