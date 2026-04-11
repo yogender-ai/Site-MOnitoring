@@ -114,7 +114,7 @@ if (RENDER_URL) {
     }).on('error', (err) => {
       console.log('Self-ping Error: ' + err.message);
     });
-  }, 14 * 60 * 1000); // 14 mins
+  }, 10 * 60 * 1000); // 10 mins
 }
 
 const PORT = process.env.PORT || 5000;
