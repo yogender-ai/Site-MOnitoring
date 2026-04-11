@@ -103,6 +103,60 @@ app.get('/api/monitors/:id/logs', requireAuth, async (req, res) => {
   }
 });
 
+// 6. Export logs as CSV
+app.get('/api/monitors/:id/logs/csv', requireAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const own = await pool.query('SELECT name FROM monitors WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    if (own.rows.length === 0) {
+      return res.status(404).json({ error: 'Monitor not found' });
+    }
+    const { rows } = await pool.query(
+      'SELECT status, latency, created_at FROM logs WHERE monitor_id = $1 ORDER BY created_at DESC',
+      [id]
+    );
+
+    let csvContent = 'Timestamp,Status,Latency(ms)\\n';
+    rows.forEach(row => {
+      csvContent += `${new Date(row.created_at).toISOString()},${row.status},${row.latency}\\n`;
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="monitor-${id}-logs.csv"`);
+    res.status(200).send(csvContent);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 7. Analytics endpoints
+app.post('/api/analytics/visit', async (req, res) => {
+  try {
+    await pool.query(`
+      INSERT INTO platform_visits (date, visits) 
+      VALUES (CURRENT_DATE, 1) 
+      ON CONFLICT (date) DO UPDATE SET visits = platform_visits.visits + 1
+    `);
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Analytics error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/analytics/visits', requireAuth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT TO_CHAR(date, 'YYYY-MM-DD') as date, visits 
+      FROM platform_visits 
+      ORDER BY date DESC LIMIT 30
+    `);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Self-ping block to prevent sleeping on free tiers
 const RENDER_URL = process.env.RENDER_EXTERNAL_URL || process.env.SELF_URL;
 if (RENDER_URL) {

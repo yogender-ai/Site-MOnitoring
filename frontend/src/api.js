@@ -39,3 +39,13 @@ export const getMonitors = () => api.get('/monitors').then((res) => res.data);
 export const addMonitor = (data) => api.post('/monitors', data).then((res) => res.data);
 export const deleteMonitor = (id) => api.delete(`/monitors/${id}`);
 export const getLogs = (id) => api.get(`/monitors/${id}/logs`).then((res) => res.data);
+
+export const exportLogsCsv = (id) => {
+  const token = getToken();
+  return fetch(`${api.defaults.baseURL}/monitors/${id}/logs/csv`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  }).then(res => res.blob());
+};
+
+export const reportPlatformVisit = () => api.post('/analytics/visit').catch(() => {});
+export const getPlatformVisits = () => api.get('/analytics/visits').then(res => res.data).catch(() => []);

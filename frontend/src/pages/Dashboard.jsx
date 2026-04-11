@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, Plus, Server, CheckCircle2, XCircle, Trash2, Clock, Globe, ChevronRight, Sun, Moon, LogOut } from 'lucide-react';
+import { Activity, Plus, Server, CheckCircle2, XCircle, Trash2, Clock, Globe, ChevronRight, Sun, Moon, LogOut, Download } from 'lucide-react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { AreaChart, Area, ResponsiveContainer, YAxis, Tooltip, XAxis, CartesianGrid } from 'recharts';
 import { format } from 'date-fns';
-import { getMonitors, addMonitor, deleteMonitor, getLogs } from '../api';
+import { getMonitors, addMonitor, deleteMonitor, getLogs, exportLogsCsv, reportPlatformVisit, getPlatformVisits } from '../api';
 import { logout } from '../auth';
 import { Toaster, toast } from 'sonner';
 
@@ -137,9 +137,22 @@ function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
               <Globe className="w-4 h-4"/> {monitor.url}
             </a>
           </div>
-          <button onClick={onClose} className="p-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-            <XCircle className="w-6 h-6" />
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={() => {
+              exportLogsCsv(monitor.id).then(blob => {
+                 const url = window.URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url;
+                 a.download = `monitor-${monitor.id}-logs.csv`;
+                 a.click();
+              });
+            }} className="flex items-center gap-2 p-2 px-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 rounded-lg text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
+              <Download className="w-4 h-4" /> CSV
+            </button>
+            <button onClick={onClose} className="p-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
+              <XCircle className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
         <div className="p-6 sm:p-8 space-y-8">
@@ -248,6 +261,18 @@ export default function Dashboard() {
   const [formData, setFormData] = useState({ name: '', url: 'https://', interval_seconds: 60 });
   const [loading, setLoading] = useState(true);
   const prevStatuses = useRef({});
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [platformVisits, setPlatformVisits] = useState([]);
+
+  useEffect(() => {
+    reportPlatformVisit();
+  }, []);
+
+  useEffect(() => {
+    if (showAnalytics) {
+      getPlatformVisits().then(setPlatformVisits);
+    }
+  }, [showAnalytics]);
 
   const loadData = () => {
     getMonitors().then(data => {
@@ -331,6 +356,14 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowAnalytics(true)}
+                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
+                title="Platform Analytics"
+              >
+                <Activity className="w-5 h-5" />
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -513,6 +546,35 @@ export default function Dashboard() {
                   Deploy Monitor
                 </button>
               </form>
+            </Motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Analytics Modal */}
+      <AnimatePresence>
+        {showAnalytics && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowAnalytics(false)} className="absolute inset-0 bg-black/40 backdrop-blur-md dark:bg-black/80" />
+            <Motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white border border-zinc-200 dark:bg-[#0a0a0a] dark:border-zinc-800 p-8 rounded-[2rem] w-full max-w-2xl relative z-10 shadow-2xl">
+               <div className="flex items-center justify-between mb-8">
+                 <h2 className="text-3xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">Platform Visitors</h2>
+                 <button onClick={() => setShowAnalytics(false)} className="p-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                   <XCircle className="w-6 h-6" />
+                 </button>
+               </div>
+               <div className="h-64 w-full bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800">
+                 <ResponsiveContainer width="100%" height="100%">
+                   <AreaChart data={platformVisits.slice().reverse()}>
+                     <XAxis dataKey="date" stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fill: isDark ? '#a1a1aa' : '#71717a', fontSize: 12}} />
+                     <YAxis stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fill: isDark ? '#a1a1aa' : '#71717a', fontSize: 12}} />
+                     <Tooltip 
+                       contentStyle={isDark ? { background: 'rgba(24, 24, 27, 0.95)', border: '1px solid #3f3f46', borderRadius: '12px' } : { background: 'white', borderRadius: '12px', border: '1px solid #e4e4e7' }}
+                     />
+                     <Area type="monotone" dataKey="visits" stroke="#10b981" fill="#10b981" fillOpacity={0.2} strokeWidth={3} />
+                   </AreaChart>
+                 </ResponsiveContainer>
+               </div>
             </Motion.div>
           </div>
         )}

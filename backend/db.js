@@ -51,6 +51,15 @@ const initDB = async () => {
       ALTER TABLE monitors ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE CASCADE;
     `);
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS platform_visits (
+        id SERIAL PRIMARY KEY,
+        date DATE DEFAULT CURRENT_DATE,
+        visits INTEGER DEFAULT 1,
+        UNIQUE(date)
+      );
+    `);
+
     console.log("Database initialized successfully!");
   } catch (error) {
     console.error("Error initializing database:", error);
