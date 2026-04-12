@@ -58,6 +58,7 @@ const initDB = async () => {
         visits INTEGER DEFAULT 1,
         UNIQUE(date)
       );
+    `);
     await pool.query(`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS notification_email VARCHAR(255);
     `);
