@@ -63,7 +63,7 @@ function describeStatusForAlert(error, response) {
 const pingAll = async () => {
   try {
     const { rows: monitors } = await pool.query(`
-      SELECT m.*, u.email AS user_email
+      SELECT m.*, u.email as primary_email, u.notification_email
       FROM monitors m
       INNER JOIN users u ON m.user_id = u.id
       WHERE m.user_id IS NOT NULL
@@ -90,14 +90,20 @@ const pingAll = async () => {
           [monitor.id, status, latency]
         );
 
-        if (previousStatus === 'UP' && status === 'DOWN' && monitor.user_email) {
+        const targetEmail = monitor.notification_email || monitor.primary_email;
+
+        if (targetEmail) {
           const timestamp = new Date().toISOString();
-          await sendSiteDownAlert({
-            to: monitor.user_email,
-            siteUrl: monitor.url,
-            statusCode: statusCodeForAlert,
-            timestamp,
-          });
+          if (previousStatus === 'UP' && status === 'DOWN') {
+            await sendSiteDownAlert({
+              to: targetEmail,
+              siteUrl: monitor.url,
+              statusCode: statusCodeForAlert,
+              timestamp,
+            });
+          } else if (previousStatus === 'DOWN' && status === 'UP') {
+            await sendSiteUpAlert(targetEmail, monitor.url, timestamp);
+          }
         }
       }
     }

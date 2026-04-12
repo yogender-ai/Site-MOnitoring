@@ -58,6 +58,30 @@ const initDB = async () => {
         visits INTEGER DEFAULT 1,
         UNIQUE(date)
       );
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS notification_email VARCHAR(255);
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS otps (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        email VARCHAR(255) NOT NULL,
+        code VARCHAR(10) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS monitor_visits (
+        id SERIAL PRIMARY KEY,
+        monitor_id INTEGER REFERENCES monitors(id) ON DELETE CASCADE,
+        date DATE DEFAULT CURRENT_DATE,
+        hour INTEGER NOT NULL,
+        visits INTEGER DEFAULT 1,
+        UNIQUE(monitor_id, date, hour)
+      );
     `);
 
     console.log("Database initialized successfully!");

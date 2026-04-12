@@ -71,7 +71,82 @@ async function sendSiteDownAlert({ to, siteUrl, statusCode, timestamp }) {
   }
 }
 
+async function sendSiteUpAlert(to, siteUrl, timestamp) {
+  const transport = getTransporter();
+  if (!transport) return;
+
+  const body = [
+    'A monitored endpoint has recovered and is now returning HTTP 200.',
+    '',
+    `Site URL: ${siteUrl}`,
+    `Time: ${timestamp}`,
+    '',
+    'You are receiving this because this monitor transitioned from DOWN to UP.',
+  ].join('\n');
+
+  try {
+    await transport.sendMail({
+      from: `"Site Monitor" <${process.env.EMAIL_USER}>`,
+      to,
+      subject: 'Site Up Alert',
+      text: body,
+    });
+  } catch (err) {
+    console.error('[mailer] Failed to send Site Up Alert:', err.message);
+  }
+}
+
+async function sendOtpEmail(to, code) {
+  const transport = getTransporter();
+  if (!transport) return;
+
+  const body = [
+    'You requested to update your notification email.',
+    '',
+    `Your verification code is: ${code}`,
+    '',
+    'This code will expire in 10 minutes.',
+  ].join('\n');
+
+  try {
+    await transport.sendMail({
+      from: `"Site Monitor" <${process.env.EMAIL_USER}>`,
+      to,
+      subject: 'Notification Email OTP Verification',
+      text: body,
+    });
+  } catch (err) {
+    console.error('[mailer] Failed to send OTP:', err.message);
+  }
+}
+
+async function sendMonitorActionAlert(to, action, siteUrl) {
+  const transport = getTransporter();
+  if (!transport) return;
+
+  const body = [
+    `A monitor has been ${action}.`,
+    '',
+    `Site URL: ${siteUrl}`,
+  ].join('\n');
+
+  try {
+    await transport.sendMail({
+      from: `"Site Monitor" <${process.env.EMAIL_USER}>`,
+      to,
+      subject: `Monitor ${action.charAt(0).toUpperCase() + action.slice(1)} Alert`,
+      text: body,
+    });
+  } catch (err) {
+    console.error(`[mailer] Failed to send Monitor Action Alert:`, err.message);
+  }
+}
+
+
 module.exports = {
   isEmailConfigured,
   sendSiteDownAlert,
+  sendSiteUpAlert,
+  sendOtpEmail,
+  sendMonitorActionAlert
 };
