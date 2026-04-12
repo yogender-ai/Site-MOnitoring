@@ -68,7 +68,7 @@ export default function Landing() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-emerald-500 via-teal-400 to-emerald-300 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transition-shadow duration-300">
               <Activity className="w-5 h-5 text-emerald-950" strokeWidth={3} />
             </div>
-            <span className="text-xl font-bold tracking-wide text-zinc-900 dark:text-white transition-colors duration-300">NEXUS</span>
+            <span className="text-xl font-bold tracking-wide text-zinc-900 dark:text-white transition-colors duration-300">Nexus Monitor</span>
           </Link>
 
           {/* Desktop nav items */}
@@ -146,7 +146,7 @@ export default function Landing() {
 
       {/* Hero Section */}
       <main className="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-20 lg:py-32 max-w-7xl mx-auto w-full">
-        <motion.div 
+        <motion.div
           className="text-center max-w-4xl mx-auto"
           initial="hidden"
           animate="visible"
@@ -181,7 +181,7 @@ export default function Landing() {
         </motion.div>
 
         {/* Feature Grid */}
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-24 w-full"
           initial="hidden"
           whileInView="visible"
@@ -189,7 +189,7 @@ export default function Landing() {
           variants={containerVariants}
         >
           {features.map((feature, idx) => (
-            <motion.div 
+            <motion.div
               key={idx}
               variants={itemVariants}
               className="p-6 rounded-2xl bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/10 transition-colors duration-300 group shadow-sm dark:shadow-none"

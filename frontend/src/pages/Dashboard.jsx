@@ -258,7 +258,7 @@ function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
           <div className="bg-zinc-50 border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 rounded-2xl p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Endpoint Visitor Analytics</h3>
-              <button 
+              <button
                 onClick={() => setShowPixel(!showPixel)}
                 className="text-sm px-3 py-1.5 rounded-lg bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors font-medium"
               >
@@ -267,18 +267,18 @@ function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
             </div>
 
             {showPixel && (
-               <Motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mb-6 overflow-hidden">
-                 <div className="p-4 bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl relative group">
-                   <p className="text-sm font-medium text-zinc-500 mb-2">Embed this tracking pixel in your endpoint's HTML or trigger via API to track visitors.</p>
-                   <code className="text-xs text-emerald-600 dark:text-emerald-400 font-mono break-all tracking-tight block p-2 bg-zinc-50 dark:bg-zinc-900 rounded-lg">{trackingCode}</code>
-                   <button 
-                     onClick={() => { navigator.clipboard.writeText(trackingCode); toast.success("Copied!"); }}
-                     className="absolute top-4 right-4 p-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
-                   >
-                     <Copy className="w-4 h-4" />
-                   </button>
-                 </div>
-               </Motion.div>
+              <Motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mb-6 overflow-hidden">
+                <div className="p-4 bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl relative group">
+                  <p className="text-sm font-medium text-zinc-500 mb-2">Embed this tracking pixel in your endpoint's HTML or trigger via API to track visitors.</p>
+                  <code className="text-xs text-emerald-600 dark:text-emerald-400 font-mono break-all tracking-tight block p-2 bg-zinc-50 dark:bg-zinc-900 rounded-lg">{trackingCode}</code>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(trackingCode); toast.success("Copied!"); }}
+                    className="absolute top-4 right-4 p-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
+              </Motion.div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -287,9 +287,9 @@ function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
                 <div className="h-48 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={analytics.hourlyVisits}>
-                      <XAxis dataKey="hour" tickFormatter={(v) => `${v}:00`} stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fontSize: 10}} />
-                      <YAxis stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fontSize: 10}} width={30} />
-                      <Tooltip cursor={{ fill: isDark ? '#27272a' : '#f4f4f5' }} contentStyle={isDark ? { background: '#18181b', border: 'none', borderRadius: '8px' } : {}}/>
+                      <XAxis dataKey="hour" tickFormatter={(v) => `${v}:00`} stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{ fontSize: 10 }} />
+                      <YAxis stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{ fontSize: 10 }} width={30} />
+                      <Tooltip cursor={{ fill: isDark ? '#27272a' : '#f4f4f5' }} contentStyle={isDark ? { background: '#18181b', border: 'none', borderRadius: '8px' } : {}} />
                       <Bar dataKey="visits" fill="#0d9488" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -302,13 +302,13 @@ function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
                     <AreaChart data={analytics.dailyVisits.slice().reverse()}>
                       <defs>
                         <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <XAxis dataKey="date" stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fontSize: 10}} tickFormatter={(v) => v.slice(5)} />
-                      <YAxis stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fontSize: 10}} width={30} />
-                      <Tooltip contentStyle={isDark ? { background: '#18181b', border: 'none', borderRadius: '8px' } : {}}/>
+                      <XAxis dataKey="date" stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
+                      <YAxis stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{ fontSize: 10 }} width={30} />
+                      <Tooltip contentStyle={isDark ? { background: '#18181b', border: 'none', borderRadius: '8px' } : {}} />
                       <Area type="monotone" dataKey="visits" stroke="#14b8a6" fill="url(#colorVisits)" strokeWidth={2} />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -356,12 +356,12 @@ function ProfileSettingsModal({ onClose, isDark }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <Motion.div 
+      <Motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
         className="absolute inset-0 bg-black/40 backdrop-blur-md dark:bg-black/80"
       />
-      <Motion.div 
+      <Motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -371,16 +371,16 @@ function ProfileSettingsModal({ onClose, isDark }) {
           <XCircle className="w-5 h-5" />
         </button>
         <div className="w-12 h-12 bg-purple-500/15 dark:bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6">
-           <User className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+          <User className="w-6 h-6 text-purple-600 dark:text-purple-400" />
         </div>
         <h2 className="text-3xl font-bold mb-2 text-zinc-900 dark:text-white">Profile Settings</h2>
         <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-sm text-sm">Update your notification email to receive alerts when your monitored endpoints go down or up, or when monitors are added/deleted.</p>
-        
+
         {step === 1 ? (
           <form onSubmit={handleRequestOtp} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Notification Email</label>
-              <input 
+              <input
                 required type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="alerts@example.com"
                 className="w-full bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-zinc-900 dark:text-white"
@@ -394,7 +394,7 @@ function ProfileSettingsModal({ onClose, isDark }) {
           <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">6-Digit Code</label>
-              <input 
+              <input
                 required type="text" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)}
                 placeholder="123456"
                 className="w-full text-center tracking-[0.5em] font-mono text-xl bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-zinc-900 dark:text-white"
