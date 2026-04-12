@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import { Activity, Plus, Server, CheckCircle2, XCircle, Trash2, Clock, Globe, ChevronRight, Sun, Moon, LogOut, Download, Menu, X } from 'lucide-react';
-=======
-import { Activity, Plus, Server, CheckCircle2, XCircle, Trash2, Clock, Globe, ChevronRight, Sun, Moon, LogOut, Download, User, Copy } from 'lucide-react';
->>>>>>> c971b669eb9323c32f72d79a5dcdd82ba8027115
+import { Activity, Plus, Server, CheckCircle2, XCircle, Trash2, Clock, Globe, ChevronRight, Sun, Moon, LogOut, Download, Menu, X, User, Copy } from 'lucide-react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, YAxis, Tooltip, XAxis, CartesianGrid } from 'recharts';
 import { format } from 'date-fns';
@@ -105,13 +101,8 @@ function MonitorCard({ monitor, onDelete, onClick, isDark }) {
 // Subcomponent: Detailed Monitoring View
 function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
   const [logs, setLogs] = useState(initialLogs);
-<<<<<<< HEAD
-
-=======
   const [analytics, setAnalytics] = useState({ dailyVisits: [], hourlyVisits: [] });
   const [showPixel, setShowPixel] = useState(false);
-  
->>>>>>> c971b669eb9323c32f72d79a5dcdd82ba8027115
   useEffect(() => {
     // Poll for real-time log updates while modal is open
     const intv = setInterval(() => {
@@ -539,6 +530,14 @@ export default function Dashboard() {
             </button>
             <button
               type="button"
+              onClick={() => setShowProfile(true)}
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
+              title="Profile Settings"
+            >
+              <User className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
               onClick={() => setTheme(isDark ? 'light' : 'dark')}
               className="flex items-center justify-center w-10 h-10 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
               aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -584,50 +583,8 @@ export default function Dashboard() {
             <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-2">
               {/* Add Endpoint */}
               <button
-<<<<<<< HEAD
                 onClick={() => { setIsAdding(true); setMobileMenuOpen(false); }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-sm hover:from-emerald-400 hover:to-teal-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-=======
-                type="button"
-                onClick={() => setShowAnalytics(true)}
-                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
-                title="Platform Analytics"
-              >
-                <Activity className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowProfile(true)}
-                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
-                title="Profile Settings"
-              >
-                <User className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  logout();
-                  navigate('/login', { replace: true });
-                }}
-                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
-                aria-label="Log out"
-                title="Log out"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setTheme(isDark ? 'light' : 'dark')}
-                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
-                aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
-                title={isDark ? 'Light mode' : 'Dark mode'}
-              >
-                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
-              <button 
-                onClick={() => setIsAdding(true)}
-                className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 sm:px-5 py-2.5 rounded-full text-sm font-semibold hover:from-emerald-400 hover:to-teal-400 shadow-[0_0_20px_rgba(16,185,129,0.25)] dark:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.45)] transition-all cursor-pointer z-50 relative hover:scale-105"
->>>>>>> c971b669eb9323c32f72d79a5dcdd82ba8027115
               >
                 <Plus className="w-4 h-4" /> Add Endpoint
               </button>
@@ -637,6 +594,12 @@ export default function Dashboard() {
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-colors"
               >
                 <Activity className="w-4 h-4 text-emerald-500" /> Platform Analytics
+              </button>
+              <button
+                onClick={() => { setShowProfile(true); setMobileMenuOpen(false); }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-colors"
+              >
+                <User className="w-4 h-4 text-indigo-500" /> Profile Settings
               </button>
               {/* Theme */}
               <button
@@ -846,7 +809,6 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-<<<<<<< HEAD
       {/* ── Footer ── */}
       <footer className="relative z-10 mt-12 w-full">
         {/* Top divider with gradient fade */}
@@ -883,13 +845,11 @@ export default function Dashboard() {
         </div>
       </footer>
 
-=======
       <AnimatePresence>
         {showProfile && (
           <ProfileSettingsModal onClose={() => setShowProfile(false)} isDark={isDark} />
         )}
       </AnimatePresence>
->>>>>>> c971b669eb9323c32f72d79a5dcdd82ba8027115
     </div>
   );
 }
