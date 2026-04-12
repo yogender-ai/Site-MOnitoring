@@ -2,14 +2,14 @@ const { pool } = require('../db');
 
 async function findByEmail(email) {
   const normalized = String(email).trim().toLowerCase();
-  const { rows } = await pool.query('SELECT id, email, password_hash FROM users WHERE email = $1', [
+  const { rows } = await pool.query('SELECT id, email, password_hash, notification_email FROM users WHERE email = $1', [
     normalized,
   ]);
   return rows[0] || null;
 }
 
 async function findById(id) {
-  const { rows } = await pool.query('SELECT id, email FROM users WHERE id = $1', [id]);
+  const { rows } = await pool.query('SELECT id, email, notification_email FROM users WHERE id = $1', [id]);
   return rows[0] || null;
 }
 

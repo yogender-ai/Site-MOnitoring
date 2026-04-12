@@ -5,6 +5,9 @@ const { pool, initDB } = require('./db');
 const { startPinger } = require('./pinger');
 const authRoutes = require('./routes/auth');
 const { requireAuth } = require('./middleware/auth');
+const profileRoutes = require('./routes/profile');
+const analyticsRoutes = require('./routes/analytics');
+const { sendMonitorActionAlert } = require('./utils/mailer');
 
 const app = express();
 app.use(cors());
@@ -20,6 +23,8 @@ initDB().then(() => {
 // -------------
 
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api', analyticsRoutes);
 
 // 1. Keep-Alive for Uptime Robot
 app.get('/api/keep-alive', (req, res) => {
@@ -65,6 +70,16 @@ app.post('/api/monitors', requireAuth, createMonitorLimiter, async (req, res) =>
       'INSERT INTO monitors (url, name, interval_seconds, status, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [url, name, interval_seconds || 60, 'UP', req.user.id]
     );
+
+    const userRes = await pool.query('SELECT email, notification_email FROM users WHERE id = $1', [req.user.id]);
+    if (userRes.rows.length > 0) {
+      const u = userRes.rows[0];
+      const notifyEmail = u.notification_email || u.email;
+      if (notifyEmail) {
+        await sendMonitorActionAlert(notifyEmail, 'added', url).catch(err => console.error(err));
+      }
+    }
+
     res.status(201).json(rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -75,10 +90,23 @@ app.post('/api/monitors', requireAuth, createMonitorLimiter, async (req, res) =>
 app.delete('/api/monitors/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query('DELETE FROM monitors WHERE id = $1 AND user_id = $2', [id, req.user.id]);
-    if (result.rowCount === 0) {
+    const monitorRes = await pool.query('SELECT url FROM monitors WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    if (monitorRes.rows.length === 0) {
       return res.status(404).json({ error: 'Monitor not found' });
     }
+    const url = monitorRes.rows[0].url;
+
+    await pool.query('DELETE FROM monitors WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+    
+    const userRes = await pool.query('SELECT email, notification_email FROM users WHERE id = $1', [req.user.id]);
+    if (userRes.rows.length > 0) {
+      const u = userRes.rows[0];
+      const notifyEmail = u.notification_email || u.email;
+      if (notifyEmail) {
+        await sendMonitorActionAlert(notifyEmail, 'deleted', url).catch(err => console.error(err));
+      }
+    }
+
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
