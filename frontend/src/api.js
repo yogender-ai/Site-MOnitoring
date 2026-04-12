@@ -49,3 +49,8 @@ export const exportLogsCsv = (id) => {
 
 export const reportPlatformVisit = () => api.post('/analytics/visit').catch(() => {});
 export const getPlatformVisits = () => api.get('/analytics/visits').then(res => res.data).catch(() => []);
+
+export const requestOtp = (email) => api.post('/profile/notification-email/request-otp', { email }).then(res => res.data);
+export const verifyOtp = (email, code) => api.post('/profile/notification-email/verify-otp', { email, code }).then(res => res.data);
+
+export const getMonitorAnalytics = (id) => api.get(`/monitors/${id}/analytics`).then(res => res.data);
