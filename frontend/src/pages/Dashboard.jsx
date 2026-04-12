@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { Activity, Plus, Server, CheckCircle2, XCircle, Trash2, Clock, Globe, ChevronRight, Sun, Moon, LogOut, Download, Menu, X } from 'lucide-react';
+=======
+import { Activity, Plus, Server, CheckCircle2, XCircle, Trash2, Clock, Globe, ChevronRight, Sun, Moon, LogOut, Download, User, Copy } from 'lucide-react';
+>>>>>>> c971b669eb9323c32f72d79a5dcdd82ba8027115
 import { AnimatePresence, motion as Motion } from 'framer-motion';
-import { AreaChart, Area, ResponsiveContainer, YAxis, Tooltip, XAxis, CartesianGrid } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, YAxis, Tooltip, XAxis, CartesianGrid } from 'recharts';
 import { format } from 'date-fns';
-import { getMonitors, addMonitor, deleteMonitor, getLogs, exportLogsCsv, reportPlatformVisit, getPlatformVisits } from '../api';
+import { getMonitors, addMonitor, deleteMonitor, getLogs, exportLogsCsv, reportPlatformVisit, getPlatformVisits, requestOtp, verifyOtp, getMonitorAnalytics } from '../api';
 import { logout } from '../auth';
 import { Toaster, toast } from 'sonner';
 
@@ -101,7 +105,13 @@ function MonitorCard({ monitor, onDelete, onClick, isDark }) {
 // Subcomponent: Detailed Monitoring View
 function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
   const [logs, setLogs] = useState(initialLogs);
+<<<<<<< HEAD
 
+=======
+  const [analytics, setAnalytics] = useState({ dailyVisits: [], hourlyVisits: [] });
+  const [showPixel, setShowPixel] = useState(false);
+  
+>>>>>>> c971b669eb9323c32f72d79a5dcdd82ba8027115
   useEffect(() => {
     // Poll for real-time log updates while modal is open
     const intv = setInterval(() => {
@@ -110,7 +120,13 @@ function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
     return () => clearInterval(intv);
   }, [monitor]);
 
+  useEffect(() => {
+    getMonitorAnalytics(monitor.id).then(setAnalytics).catch(e => console.error(e));
+  }, [monitor.id]);
+
   const isUp = monitor.status === 'UP';
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const trackingCode = `<img src="${apiUrl}/track/${monitor.id}" alt="" style="display:none;" />`;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-center p-4 sm:p-6 overflow-y-auto">
@@ -247,7 +263,158 @@ function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
               </table>
             </div>
           </div>
+          {/* Visitor Analytics */}
+          <div className="bg-zinc-50 border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 rounded-2xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Endpoint Visitor Analytics</h3>
+              <button 
+                onClick={() => setShowPixel(!showPixel)}
+                className="text-sm px-3 py-1.5 rounded-lg bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors font-medium"
+              >
+                Tracker Snippet
+              </button>
+            </div>
+
+            {showPixel && (
+               <Motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mb-6 overflow-hidden">
+                 <div className="p-4 bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl relative group">
+                   <p className="text-sm font-medium text-zinc-500 mb-2">Embed this tracking pixel in your endpoint's HTML or trigger via API to track visitors.</p>
+                   <code className="text-xs text-emerald-600 dark:text-emerald-400 font-mono break-all tracking-tight block p-2 bg-zinc-50 dark:bg-zinc-900 rounded-lg">{trackingCode}</code>
+                   <button 
+                     onClick={() => { navigator.clipboard.writeText(trackingCode); toast.success("Copied!"); }}
+                     className="absolute top-4 right-4 p-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                   >
+                     <Copy className="w-4 h-4" />
+                   </button>
+                 </div>
+               </Motion.div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-xs uppercase tracking-widest text-zinc-500 mb-4 font-bold">Today's Hourly Visits</h4>
+                <div className="h-48 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analytics.hourlyVisits}>
+                      <XAxis dataKey="hour" tickFormatter={(v) => `${v}:00`} stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fontSize: 10}} />
+                      <YAxis stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fontSize: 10}} width={30} />
+                      <Tooltip cursor={{ fill: isDark ? '#27272a' : '#f4f4f5' }} contentStyle={isDark ? { background: '#18181b', border: 'none', borderRadius: '8px' } : {}}/>
+                      <Bar dataKey="visits" fill="#0d9488" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-xs uppercase tracking-widest text-zinc-500 mb-4 font-bold">Past 30 Days</h4>
+                <div className="h-48 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={analytics.dailyVisits.slice().reverse()}>
+                      <defs>
+                        <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="date" stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fontSize: 10}} tickFormatter={(v) => v.slice(5)} />
+                      <YAxis stroke={isDark ? '#52525b' : '#a1a1aa'} tick={{fontSize: 10}} width={30} />
+                      <Tooltip contentStyle={isDark ? { background: '#18181b', border: 'none', borderRadius: '8px' } : {}}/>
+                      <Area type="monotone" dataKey="visits" stroke="#14b8a6" fill="url(#colorVisits)" strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </Motion.div>
+    </div>
+  );
+}
+
+function ProfileSettingsModal({ onClose, isDark }) {
+  const [email, setEmail] = useState('');
+  const [step, setStep] = useState(1);
+  const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleRequestOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await requestOtp(email);
+      toast.success('OTP sent to ' + email);
+      setStep(2);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to request OTP');
+    }
+    setLoading(false);
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await verifyOtp(email, otp);
+      toast.success('Notification email updated successfully!');
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to verify OTP');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <Motion.div 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/40 backdrop-blur-md dark:bg-black/80"
+      />
+      <Motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        className="bg-white border border-zinc-200 dark:bg-[#0a0a0a] dark:border-zinc-800 p-8 rounded-[2rem] w-full max-w-md relative z-10 shadow-2xl"
+      >
+        <button onClick={onClose} className="absolute top-6 right-6 p-2 bg-zinc-100 dark:bg-zinc-900 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+          <XCircle className="w-5 h-5" />
+        </button>
+        <div className="w-12 h-12 bg-purple-500/15 dark:bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6">
+           <User className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+        </div>
+        <h2 className="text-3xl font-bold mb-2 text-zinc-900 dark:text-white">Profile Settings</h2>
+        <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-sm text-sm">Update your notification email to receive alerts when your monitored endpoints go down or up, or when monitors are added/deleted.</p>
+        
+        {step === 1 ? (
+          <form onSubmit={handleRequestOtp} className="flex flex-col gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Notification Email</label>
+              <input 
+                required type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="alerts@example.com"
+                className="w-full bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-zinc-900 dark:text-white"
+              />
+            </div>
+            <button type="submit" disabled={loading} className="w-full bg-zinc-900 text-white dark:bg-white dark:text-black py-3.5 rounded-xl font-bold mt-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50">
+              {loading ? 'Sending OTP...' : 'Request Verification Code'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">6-Digit Code</label>
+              <input 
+                required type="text" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)}
+                placeholder="123456"
+                className="w-full text-center tracking-[0.5em] font-mono text-xl bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-zinc-900 dark:text-white"
+              />
+              <p className="text-emerald-500 mt-2 text-xs text-center font-medium">OTP sent to {email}</p>
+            </div>
+            <button type="submit" disabled={loading} className="w-full bg-zinc-900 text-white dark:bg-white dark:text-black py-3.5 rounded-xl font-bold mt-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50">
+              {loading ? 'Verifying...' : 'Verify & Setup Alerts'}
+            </button>
+          </form>
+        )}
       </Motion.div>
     </div>
   );
@@ -262,6 +429,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const prevStatuses = useRef({});
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [platformVisits, setPlatformVisits] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -416,8 +584,50 @@ export default function Dashboard() {
             <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-2">
               {/* Add Endpoint */}
               <button
+<<<<<<< HEAD
                 onClick={() => { setIsAdding(true); setMobileMenuOpen(false); }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-sm hover:from-emerald-400 hover:to-teal-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+=======
+                type="button"
+                onClick={() => setShowAnalytics(true)}
+                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
+                title="Platform Analytics"
+              >
+                <Activity className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowProfile(true)}
+                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
+                title="Profile Settings"
+              >
+                <User className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  navigate('/login', { replace: true });
+                }}
+                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
+                aria-label="Log out"
+                title="Log out"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:border-zinc-700 transition-colors"
+                aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+                title={isDark ? 'Light mode' : 'Dark mode'}
+              >
+                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+              <button 
+                onClick={() => setIsAdding(true)}
+                className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 sm:px-5 py-2.5 rounded-full text-sm font-semibold hover:from-emerald-400 hover:to-teal-400 shadow-[0_0_20px_rgba(16,185,129,0.25)] dark:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.45)] transition-all cursor-pointer z-50 relative hover:scale-105"
+>>>>>>> c971b669eb9323c32f72d79a5dcdd82ba8027115
               >
                 <Plus className="w-4 h-4" /> Add Endpoint
               </button>
@@ -636,6 +846,7 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
+<<<<<<< HEAD
       {/* ── Footer ── */}
       <footer className="relative z-10 mt-12 w-full">
         {/* Top divider with gradient fade */}
@@ -672,6 +883,13 @@ export default function Dashboard() {
         </div>
       </footer>
 
+=======
+      <AnimatePresence>
+        {showProfile && (
+          <ProfileSettingsModal onClose={() => setShowProfile(false)} isDark={isDark} />
+        )}
+      </AnimatePresence>
+>>>>>>> c971b669eb9323c32f72d79a5dcdd82ba8027115
     </div>
   );
 }
