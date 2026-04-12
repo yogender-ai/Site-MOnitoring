@@ -7,7 +7,11 @@
 }
 
 @layer base {
+  html, body {
+    overflow-x: hidden;
+  }
   body {
     @apply bg-zinc-50 text-zinc-900 min-h-screen antialiased font-sans selection:bg-emerald-500/20 dark:bg-black dark:text-white dark:selection:bg-emerald-500/30;
   }
 }
+
