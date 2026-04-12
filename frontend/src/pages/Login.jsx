@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Activity } from 'lucide-react';
+import { Activity, ArrowLeft } from 'lucide-react';
 import { loginRequest } from '../api';
 import { getToken, setToken } from '../auth';
 
@@ -11,10 +11,10 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || '/dashboard';
 
   if (getToken()) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   async function handleSubmit(e) {
@@ -35,7 +35,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-[#000000] dark:text-white flex flex-col items-center justify-center p-6 font-sans">
-      <div className="w-full max-w-md">
+      <Link to="/" className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-sm font-semibold text-zinc-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back home
+      </Link>
+      
+      <div className="w-full max-w-md relative z-10">
         <div className="flex items-center justify-center gap-3 mb-10">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-emerald-300 flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <Activity className="w-7 h-7 text-emerald-950" />

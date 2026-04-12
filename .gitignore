@@ -11,3 +11,6 @@ backend/.env
 frontend/.env
 .github/
 .vscode/
+
+backend/package-lock.json
+.env

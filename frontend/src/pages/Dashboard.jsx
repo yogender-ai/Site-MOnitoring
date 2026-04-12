@@ -125,19 +125,19 @@ function DetailedModal({ monitor, initialLogs, onClose, isDark }) {
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="bg-white border border-zinc-200 dark:bg-[#0a0a0a] dark:border-zinc-800 rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl relative z-10 flex flex-col"
       >
-        <div className="sticky top-0 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 p-6 sm:px-8 flex justify-between items-start z-20">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">{monitor.name}</h2>
+        <div className="sticky top-0 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 p-6 sm:px-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 z-20">
+          <div className="w-full">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white truncate max-w-full">{monitor.name}</h2>
               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${isUp ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
                 {monitor.status}
               </span>
             </div>
-            <a href={monitor.url} target="_blank" rel="noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <Globe className="w-4 h-4"/> {monitor.url}
+            <a href={monitor.url} target="_blank" rel="noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-flex items-center gap-2 truncate max-w-full">
+              <Globe className="w-4 h-4 shrink-0"/> <span className="truncate">{monitor.url}</span>
             </a>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 self-end sm:self-auto shrink-0 z-10 w-full sm:w-auto justify-end">
             <button onClick={() => {
               exportLogsCsv(monitor.id).then(blob => {
                  const url = window.URL.createObjectURL(blob);
